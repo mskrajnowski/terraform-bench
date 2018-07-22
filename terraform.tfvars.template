@@ -1,1 +1,5 @@
 hcloud_token=""
+
+scaleway_organization_id=""
+scaleway_secret_key=""
+scaleway_region="ams1"
