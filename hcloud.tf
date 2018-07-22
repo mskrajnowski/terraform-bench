@@ -4,19 +4,19 @@ provider "hcloud" {
   token = "${var.hcloud_token}"
 }
 
-resource "hcloud_ssh_key" "me" {
-  name       = "me"
+resource "hcloud_ssh_key" "bench" {
+  name       = "bench"
   public_key = "${local.public_key}"
 }
 
-resource "hcloud_server" "server" {
-  name        = "server"
+resource "hcloud_server" "bench" {
+  name        = "bench"
   server_type = "cx11"
   image       = "debian-9"
   location    = "nbg1"
 
   ssh_keys = [
-    "${hcloud_ssh_key.me.name}",
+    "${hcloud_ssh_key.bench.name}",
   ]
 
   connection {
@@ -38,17 +38,17 @@ resource "hcloud_server" "server" {
   }
 
   provisioner "local-exec" {
-    command = "mkdir -p ./logs/hcloud && scp -r -i ${local.private_key_file} -o StrictHostKeyChecking=no root@${hcloud_server.server.ipv4_address}:/var/log/geekbench ./logs/hcloud"
+    command = "mkdir -p ./logs/hcloud && scp -r -i ${local.private_key_file} -o StrictHostKeyChecking=no root@${hcloud_server.bench.ipv4_address}:/var/log/geekbench ./logs/hcloud"
   }
 }
 
 output "hcloud_server_ip" {
-  value = "${hcloud_server.server.ipv4_address}"
+  value = "${hcloud_server.bench.ipv4_address}"
 }
 
 data "external" "hcloud" {
   program    = ["cat", "./logs/hcloud/geekbench/result.json"]
-  depends_on = ["hcloud_server.server"]
+  depends_on = ["hcloud_server.bench"]
 }
 
 output "hcloud" {
